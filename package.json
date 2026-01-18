@@ -1,0 +1,23 @@
+{
+  "name": "meet-by-ebs",
+  "version": "1.0.0",
+  "description": "It's a A real-time video conferencing app similar to Google Meet, built with Node.js and WebRTC",
+  "keywords": [
+    "meet",
+    "ebs",
+    "realtime",
+    "webrtc"
+  ],
+  "license": "ISC",
+  "start": "node server",
+  "author": "EBS (Developed by Naim Siddiqui)",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3"
+  }
+}
