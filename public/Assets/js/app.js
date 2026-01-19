@@ -1,4 +1,11 @@
 var AppProcess = function () {
+    var peers_connection_ids = [];
+    var peers_connection = [];
+    var serverProcess;
+    function _init(SDP_function, my_connid) {
+        serverProcess = SDP_function;
+        my_connection_id = my_connid;
+    }
     var iceConfiguration = {
         iceServers: [
             {
@@ -12,11 +19,38 @@ var AppProcess = function () {
 
     function setConnection(connid) {
         var connection = new RTCPeerConnection(iceConfiguration);
+        connection.onnegotiationneeded = async function (event) {
+            await setOffer(connid);
+        }
+
+        connection.onicecandidate = function (event) {
+            if (event.candidate) {
+                serverProcess(
+                    JSON.stringify({ icecandidate: event.candidate }),
+                    connid
+                );
+            }
+        };
+        connection.ontrack = function (event) {
+
+        }
+        peers_connection_ids[connid] = connid;
+        peers_connection[connid] = connection;
+    }
+
+    function setOffer(connid) {
+        var connection = peers_connection[connid];
+        var offer = await connection.createOffer();
+        await connection.setLocalDescription(offer);
+        serverProcess(JSON.stringify({ offer: connection.setLocalDescription }), connid);
     }
 
     return {
         setNewConnection: async function (connid) {
             await setConnection(connid);
+        },
+        init: async function (SDP_function, my_connid) {
+            await _init(SDP_function, my_connid);
         },
     };
 };
@@ -33,8 +67,20 @@ var MyApp = (function () {
 
     function event_process_for_signaling_server() {
         socket = io.connect();
+
+        var SDP_function = function (data, to_connid) {
+            socket.emit("SDPProcess", {
+                message: data,
+                to_connid: to_connid
+            })
+        }
+
         socket.on("connect", () => {
             if (socket.connected) {
+
+
+                AppProcess.init(SDP_function, socket.id)
+
                 if (user_id != "" && meeting_id != "") {
                     socket.emit("userconnect", {
                         displayName: user_id,
