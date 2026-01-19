@@ -1,3 +1,26 @@
+var AppProcess = function () {
+    var iceConfiguration = {
+        iceServers: [
+            {
+                urls: "stun:stun.l.google.com:19302",
+            },
+            {
+                urls: "stun:stun1.l.google.com:19302",
+            },
+        ]
+    }
+
+    function setConnection(connid) {
+        var connection = new RTCPeerConnection(iceConfiguration);
+    }
+
+    return {
+        setNewConnection: async function (connid) {
+            await setConnection(connid);
+        },
+    };
+};
+
 var MyApp = (function () {
     var socket = null;
     var user_id = "";
@@ -22,7 +45,18 @@ var MyApp = (function () {
         });
         socket.on("inform_others_about_me", function (data) {
             addUser(data.other_user_id, data.connId);
+            AppProcess.setNewConnection(data.connId);
         });
+    }
+
+    function addUser(other_user_id, connId) {
+        var newDivId = $("#otherTemplate").clone();
+        newDivId = newDivId.attr("id", connId).addClass("other");
+        newDivId.find("h2").text(other_user_id);
+        newDivId.find("video").attr("id", "v_" + connId);
+        newDivId.find("audio").attr("id", "a_" + connId);
+        newDivId.show();
+        $("#divUsers").append(newDivId);
     }
 
     return {
