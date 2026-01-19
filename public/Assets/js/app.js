@@ -1,8 +1,16 @@
 var MyApp = (function () {
-    function init(uid, mid){
-        alert("From app.js, User ID: " + uid + "\nMeeting ID: " + mid);
+    function init(uid, mid) {
+        event_process_for_signaling_server();
     }
-    
+
+    var socket = null;
+    function event_process_for_signaling_server() {
+        socket = io();
+        socket.on("connect", () => {
+            alert("socket connected to client side");
+        });
+    }
+
     return {
         _init: function (uid, mid) {
             init(uid, mid);
