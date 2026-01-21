@@ -94,10 +94,10 @@
     <script>
         $(function () {
             $(document).on("click", ".join-meeting", function () {
-                $("#.enter-code").focus();
+                $(".enter-code").focus();
             })
             $(document).on("click", ".join-action", function () {
-                var join_value = $("#.enter-code").val();
+                var join_value = $(".enter-code").val();
                 var meetingUrl = window.location.origin + "?meetingID=" + join_value;
                 window.location.replace(meetingUrl);
             })
