@@ -32,17 +32,42 @@ var AppProcess = function () {
             }
         };
         connection.ontrack = function (event) {
+            if (!remote_vid_stream[connid]) {
+                remote_vid_stream[connid] = new MediaStream();
+            }
 
+            if (!remote_aud_stream[connid]) {
+                remote_aud_stream[connid] = new MediaStream();
+            }
+
+            if (event.track.kind == "video") {
+                remote_vid_stream[connid]
+                    .getVideoTracks()
+                    .forEach((t) => remote_vid_stream[connid].removeTrack(t));
+                remote_vid_stream[connid].addTrack(event.track);
+                var remoteVideoPlayer = document.getElementById("v_" + connid);
+                remoteVideoPlayer.srcObject = null;
+                remoteVideoPlayer.srcObject = remote_vid_stream[connid];
+                remoteVideoPlayer.load();
+            } else if (event.track.kind == "audio") {
+                remote_aud_stream[connid].getAudioTracks().forEach((t) => remote_aud_stream[connid].removeTrack(t));
+                remote_aud_stream[connid].addTrack(event.track);
+                var remoteAudioPlayer = document.getElementById("a_" + connid);
+                remoteAudioPlayer.srcObject = null;
+                remoteAudioPlayer.srcObject = remote_aud_stream[connid];
+                remoteAudioPlayer.load();
+            }
         }
         peers_connection_ids[connid] = connid;
         peers_connection[connid] = connection;
+        return connection;
     }
 
-    function setOffer(connid) {
+    async function setOffer(connid) {
         var connection = peers_connection[connid];
         var offer = await connection.createOffer();
         await connection.setLocalDescription(offer);
-        serverProcess(JSON.stringify({ offer: connection.setLocalDescription }), connid);
+        serverProcess(JSON.stringify({ offer: connection.localDescription }), connid);
     }
 
     return {
@@ -52,8 +77,11 @@ var AppProcess = function () {
         init: async function (SDP_function, my_connid) {
             await _init(SDP_function, my_connid);
         },
+        processClientFunc: async function (SDP_function, my_connid) {
+            await SDPProcess(data, from_connid);
+        },
     };
-};
+}();
 
 var MyApp = (function () {
     var socket = null;
