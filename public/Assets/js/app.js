@@ -61,6 +61,31 @@ var AppProcess = function () {
         })
     }
 
+    function connection_status(connection) {
+        if (
+            connection &&
+            (connection.connectionState === "new" ||
+                connection.connectionState === "connecting" ||
+                connection.connectionState === "connected")
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    async function updateMediaSenders(track, rtp_senders) {
+        for (var con_id in peers_connection_ids) {
+            if (connection_status(peers_connection[con_id])) {
+                if (rtp_senders[con_id] && rtp_senders[con_id].track) {
+                    rtp_senders[con_id].replaceTrack(track);
+                } else {
+                    rtp_senders[con_id] = peers_connection[con_id].addTrack(track);
+                }
+            }
+        }
+    }
+
     async function videoProcess(newVideoState) {
         try {
             var vstream = null;
@@ -150,7 +175,6 @@ var AppProcess = function () {
         }
         peers_connection_ids[connid] = connid;
         peers_connection[connid] = connection;
-        return connection;
         if (
             video_st == video_states.Camera ||
             video_st == video_states.ScreenShare
@@ -159,6 +183,7 @@ var AppProcess = function () {
                 updateMediaSenders(videoCamTrack, rtp_vid_senders);
             }
         }
+        return connection;
     }
 
     async function setOffer(connid) {
