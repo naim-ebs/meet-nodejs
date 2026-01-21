@@ -1,11 +1,64 @@
 var AppProcess = function () {
     var peers_connection_ids = [];
     var peers_connection = [];
+    var remote_vid_stream = [];
+    var remote_aud_stream = [];
+    var local_div;
     var serverProcess;
-    function _init(SDP_function, my_connid) {
+    var audio;
+    var isAudioMute = true;
+    var rtp_aud_senders = [];
+    var video_states = {
+        None: 0,
+        Camera: 1,
+        ScreenShare: 2
+    };
+    var video_st = video_states.None; ß
+
+    async function _init(SDP_function, my_connid) {
         serverProcess = SDP_function;
         my_connection_id = my_connid;
+        eventProcess();
+        local_div = document.getElementById("locaVideoPlayer");
     }
+
+    function eventProcess() {
+        $("#miceMuteUnmute").on("click", async function () {
+            if (!audio) {
+                await loadAudio();
+            }
+            if (!audio) {
+                alert("Audio permission has not granted");
+                return;
+            }
+            if (isAudioMute) {
+                audio.enabled = true;
+                $(this).html("<span class='material-icons'>mic</span>");
+                updateMediaSenders(audio, rtp_aud_senders);
+            } else {
+                audio.enabled = false;
+                $(this).html("<span class='material-icons'>mic_off</span>");
+                removeMediaSenders(rtp_aud_senders);
+            }
+            isAudioMute = !isAudioMute;
+        });
+        $("#videoCamOnOff").on("click", async function () {
+            if (video_st == video_states.Camera) {
+                await videoProcess(video_states.None)
+            } else {
+                await videoProcess(video_states.Camera)
+            }
+        })
+
+        $("#ScreenShareOnOff").on("click", async function () {
+            if (video_st == video_states.ScreenShare) {
+                await videoProcess(video_states.None)
+            } else {
+                await videoProcess(video_states.ScreenShare)
+            }
+        })
+    }
+
     var iceConfiguration = {
         iceServers: [
             {
