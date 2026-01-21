@@ -15,12 +15,13 @@ var AppProcess = function () {
     };
     var video_st = video_states.None;
     var videoCamTrack;
+    var rtp_vid_senders = [];
 
     async function _init(SDP_function, my_connid) {
         serverProcess = SDP_function;
         my_connection_id = my_connid;
         eventProcess();
-        local_div = document.getElementById("locaVideoPlayer");
+        local_div = document.getElementById("localVideoPlayer");
     }
 
     function eventProcess() {
@@ -85,6 +86,8 @@ var AppProcess = function () {
                 videoCamTrack = vstream.getVideoTracks()[0];
                 if (videoCamTrack) {
                     local_div.srcObject = new MediaStream([videoCamTrack]);
+                    // alert("Video cam found");
+                    updateMediaSenders(videoCamTrack, rtp_vid_senders);
                 }
             }
         } catch (error) {
@@ -148,6 +151,14 @@ var AppProcess = function () {
         peers_connection_ids[connid] = connid;
         peers_connection[connid] = connection;
         return connection;
+        if (
+            video_st == video_states.Camera ||
+            video_st == video_states.ScreenShare
+        ) {
+            if (videoCamTrack) {
+                updateMediaSenders(videoCamTrack, rtp_vid_senders);
+            }
+        }
     }
 
     async function setOffer(connid) {
@@ -213,6 +224,9 @@ var MyApp = (function () {
     function init(uid, mid) {
         user_id = uid;
         meeting_id = mid;
+        $("#meetingContainer").show();
+        $("#me h2").text(user_id + " (Me)");
+        document.title = user_id;
         event_process_for_signaling_server();
     }
 
