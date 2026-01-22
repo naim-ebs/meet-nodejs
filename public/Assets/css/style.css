@@ -156,3 +156,51 @@ video {
   border: 1px solid gray;
   width: 300px;
 }
+
+/* Chat section styles */
+.g-right-details-wrap {
+  display: flex !important;
+  flex-direction: column;
+  overflow: hidden !important;
+}
+
+.in-call-wrap {
+  display: flex !important;
+  flex-direction: column;
+  min-height: 0 !important;
+  flex: 1;
+}
+
+.chat-show-wrap {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0 !important;
+}
+
+.chat-message-show {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.chat-message-sent-input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px 12px;
+  background-color: white;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.chat-message-sent-action {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+}

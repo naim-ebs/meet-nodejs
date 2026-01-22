@@ -101,7 +101,7 @@ var AppProcess = function () {
     function removeMediaSenders(rtp_senders) {
         for (var con_id in peers_connection_ids) {
             if (rtp_senders[con_id] && connection_status(peers_connection[con_id])) {
-                peers_connection[con_id].removeTrack(rtpSenders[con_id]);  // 错误：rtpSenders vs rtp_senders
+                peers_connection[con_id].removeTrack(rtp_senders[con_id]);
                 rtp_senders[con_id] = null;
             }
         }
@@ -125,7 +125,7 @@ var AppProcess = function () {
                 '<span class="material-icons">present_to_all</span><div>Present Now</div>'
             );
             video_st = newVideoState;
-            removeVideoStream(rtp_vid_sender);
+            removeVideoStream(rtp_vid_senders);
             return;
         }
 
@@ -312,14 +312,14 @@ var AppProcess = function () {
         }
 
         if (remote_aud_stream[connid]) {
-            remote_aud_stream[connid].getTrack().forEach((t) => {
+            remote_aud_stream[connid].getTracks().forEach((t) => {
                 if (t.stop) t.stop();
             })
             remote_aud_stream[connid] = null;
         }
 
         if (remote_vid_stream[connid]) {
-            remote_vid_stream[connid].getTrack().forEach((t) => {
+            remote_vid_stream[connid].getTracks().forEach((t) => {
                 if (t.stop) t.stop();
             })
             remote_vid_stream[connid] = null;
