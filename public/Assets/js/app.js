@@ -402,25 +402,43 @@ var MyApp = (function () {
         socket.on("SDPProcess", async function (data) {
             await AppProcess.processClientFunc(data.message, data.from_connid);
         });
+        socket.on("showChatMessage", function (data) {
+            var time = new Date();
+            var lTime = time.toLocaleString("en-US", {
+                hour: "numeric",
+                minute: "numeric",
+                hour12: true
+            })
+            var div = $("<div>").html("<span class='font-weight-bold mr-3' style='color:black'>" + data.from + "</span>" + lTime + "</br>" + data.message);
+            $("#messages").append(div);
+        })
     }
 
     function eventHandeling() {
         $("#btnsend").on("click", function () {
-            socket.emit("sendMessage", $("#msgbox").val());
-            $("#msgbox").val("");
+            var msgData = $("#msgbox").text().trim();
+            if (msgData) {
+                socket.emit("sendMessage", msgData);
+                var time = new Date();
+                var lTime = time.toLocaleString("en-US", {
+                    hour: "numeric",
+                    minute: "numeric",
+                    hour12: true,
+                });
+                var div = $("<div>").html(
+                    "<span class='font-weight-bold mr-3' style='color:black'>" +
+                    user_id +
+                    "</span>" +
+                    lTime +
+                    "</br>" +
+                    msgData
+                );
+                $("#messages").append(div);
+                $("#msgbox").text("");
+            }
         });
     }
 
-    socket.on("showChatMessage", function (data) {
-        var time = new Date();
-        var lTime = time.toLocaleString("en-US", {
-            hour: "numeric",
-            minute: "numeric",
-            hour12: true
-        })
-        var div = $("<div>").html("<span class='font-weight-bold mr-3' style='color:black'>" + data.from + "</span>" + lTime + "</br>" + data.message);
-        $("#messages").append(div);
-    })
 
     function addUser(other_user_id, connId) {
         var newDivId = $("#otherTemplate").clone();
