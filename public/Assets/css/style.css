@@ -204,3 +204,11 @@ video {
   width: 40px;
   height: 40px;
 }
+
+.participant-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100%;
+  padding: 8px 0;
+}
