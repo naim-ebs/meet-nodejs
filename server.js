@@ -73,8 +73,10 @@ io.on("connection", (socket) => {
 
             var list = userConnections.filter((p) => p.meeting_id === meetingid);
             list.forEach((v) => {
+                var userNumberAfUserLeave = userConnections.length;
                 socket.to(v.connectionId).emit("inform_other_about_disconnected_user", {
                     connId: socket.id,
+                    uNumber: userNumberAfUserLeave
                 });
             });
         }

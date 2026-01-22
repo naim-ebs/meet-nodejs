@@ -383,6 +383,8 @@ var MyApp = (function () {
 
         socket.on("inform_other_about_disconnected_user", function (data) {
             $("#" + data.connId).remove();
+            $(".participant-count").text(data.uNumber);
+            $("#participant_" + data.connId).remove();
             AppProcess.closeConnectionCall(data.connId);
         });
 
@@ -475,12 +477,52 @@ var MyApp = (function () {
     $(document).on("click", ".people-heading", function () {
         $(".in-call-wrap-up").show(300);
         $(".chat-show-wrap").hide(300);
+        $(this).addClass("active");
+        $(".chat-heading").removeClass("active");
     });
 
     $(document).on("click", ".chat-heading", function () {
         $(".in-call-wrap-up").hide(300);
         $(".chat-show-wrap").show(300);
+        $(this).addClass("active");
+        $(".people-heading").removeClass("active");
     });
+
+    $(document).on("click", ".meeting-heading-cross", function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        $(".g-right-details-wrap").addClass("panel-hidden");
+        return false;
+    });
+    
+    $(document).on("click", ".meeting-heading-cross span", function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        $(".g-right-details-wrap").addClass("panel-hidden");
+        return false;
+    });
+    
+    $(document).on("click", ".meeting-details-button", function (e) {
+        e.stopPropagation();
+        $(".g-right-details-wrap").removeClass("panel-hidden");
+    });
+
+    $(document).on("click", ".top-left-participant-wrap", function () {
+        $(".g-right-details-wrap").removeClass("panel-hidden");
+        $(".in-call-wrap-up").show(300);
+        $(".chat-show-wrap").hide(300);
+        $(".people-heading").addClass("active");
+        $(".chat-heading").removeClass("active");
+    });
+
+    $(document).on("click", ".top-left-chat-wrap", function () {
+        $(".g-right-details-wrap").removeClass("panel-hidden");
+        $(".in-call-wrap-up").hide(300);
+        $(".chat-show-wrap").show(300);
+        $(".chat-heading").addClass("active");
+        $(".people-heading").removeClass("active");
+    });
+    
 
     return {
         _init: function (uid, mid) {
