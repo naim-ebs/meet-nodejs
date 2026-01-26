@@ -441,6 +441,8 @@ var MyApp = (function () {
                 $("#msgbox").text("");
             }
         });
+        var url = window.location.href;
+        $(".meeting_url").text(url);
     }
 
 
@@ -546,6 +548,18 @@ var MyApp = (function () {
     $(document).on("click", ".call-cancel-action", function () {
         $('.top-box-show').html('');
     })
+
+    $(document).on("click", ".copy_info", function () {
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val($(".meeting_url").text()).select();
+        document.execCommand("copy");
+        $temp.remove();
+        $(".link-conf").show();
+        setTimeout(function () {
+            $(".link-conf").hide();
+        }, 3000);
+    });
 
     return {
         _init: function (uid, mid) {
