@@ -649,6 +649,10 @@ var MyApp = (function () {
         });
     });
 
+    $(document).on("click", ".option-icon", function () {
+        $(".recording-show").toggle(300);
+    });
+
     return {
         _init: function (uid, mid) {
             init(uid, mid);
