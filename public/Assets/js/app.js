@@ -548,6 +548,16 @@ var MyApp = (function () {
         })
     })
 
+    $(document).mouseup(function (e) {
+        var container = new Array();
+        container.push($(".g-details"));
+        $.each(container, function (key, value) {
+            if (!$(value).is(e.target) && $(value).has(e.target).length == 0) {
+                $(value).hide(300);
+            }
+        })
+    })
+
     $(document).on("click", ".call-cancel-action", function () {
         $('.top-box-show').html('');
     })
@@ -562,6 +572,18 @@ var MyApp = (function () {
         setTimeout(function () {
             $(".link-conf").hide();
         }, 3000);
+    });
+
+    $(document).on("click", ".meeting-details-button", function () {
+        $(".g-details").slideDown(300);
+    });
+    $(document).on("click", ".g-details-heading-attachment", function () {
+        $(".g-details-heading-show").hide();
+        $(".g-details-heading-show-attachment").show();
+    });
+    $(document).on("click", ".g-details-heading-detail", function () {
+        $(".g-details-heading-show").show();
+        $(".g-details-heading-show-attachment").hide();
     });
 
     return {
