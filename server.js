@@ -4,6 +4,9 @@ var app = express();
 var server = app.listen(3000, function () {
     console.log("Listening on port 3000");
 });
+const fs = require("fs");
+const fileUpload = require("express-fileupload");
+const path = require("path");
 
 const io = require("socket.io")(server, {
     allowEIO3: true
@@ -81,4 +84,26 @@ io.on("connection", (socket) => {
             });
         }
     });
+});
+
+app.use(fileUpload());
+app.post("/attachimg", function (req, res) {
+    var data = req.body;
+    var imageFile = req.files.zipfile;
+    console.log(imageFile);
+    var dir = "public/attachment/" + data.meeting_id + "/";
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+    }
+
+    imageFile.mv(
+        "public/attachment/" + data.meeting_id + "/" + imageFile.name,
+        function (error) {
+            if (error) {
+                console.log("couldn't upload the image file , error: ", error);
+            } else {
+                console.log("Image file successfully uploaded");
+            }
+        }
+    );
 });
