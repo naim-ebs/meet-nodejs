@@ -10,7 +10,17 @@ const fileUpload = require("express-fileupload");
 const io = require("socket.io")(server, {
     allowEIO3: true
 });
-app.use(express.static(path.join(__dirname, "")));
+
+app.use(express.static(path.join(__dirname, ""), { index: false }));
+
+// Serve action.html at root, index.html when meetingID is present
+app.get("/", function (req, res) {
+    if (req.query.meetingID) {
+        res.sendFile(path.join(__dirname, "index.html"));
+    } else {
+        res.sendFile(path.join(__dirname, "action.html"));
+    }
+});
 
 var userConnections = [];
 
