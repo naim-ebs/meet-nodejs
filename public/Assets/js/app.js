@@ -443,6 +443,9 @@ var MyApp = (function () {
         });
         var url = window.location.href;
         $(".meeting_url").text(url);
+        $("#divUsers").on("dblclick", "video", function () {
+            this.requestFullscreen();
+        });
     }
 
 
