@@ -388,11 +388,35 @@ var MyApp = (function () {
             AppProcess.closeConnectionCall(data.connId);
         });
 
+        socket.on("showFileMessage", function (data) {
+            var attachFileArea = document.querySelector(".show-attach-file");
+            attachFileArea.innerHTML += "<div class='left-align' style='display:flex; align-items:center;'><img src='public/assets/images/other.jpg' style='height:40px;width:40px;' class='caller-image circle'><div style='font-weight:600;margin:0 5px;'>" + data.username + "</div>:<div><a style='color:#007bff;' href='" + data.filePath + "' download>" + data.fileName + "</a></div></div><br/>";
+        });
+
 
         socket.on("inform_others_about_me", function (data) {
             addUser(data.other_user_id, data.connId, data.userNumber);
             AppProcess.setNewConnection(data.connId);
         });
+
+        socket.on("fileTransferToOther", (msg) => {
+            console.log(msg);
+            var mUser = userConnections.find((p) => p.connectionId == socket.id);
+            if (mUser) {
+                var meetingid = mUser.meeting_id;
+                var from = mUser.user_id;
+                var list = userConnections.filter((p) => p.meeting_id == meetingid);
+                list.forEach((v) => {
+                    socket.to(v.connectionId).emit("showChatMessage", {
+                        username: msg.username,
+                        meetingid: msg.meetingid,
+                        filePath: msg.filePath,
+                        fileName: msg.fileName,
+                    });
+                });
+            }
+        });
+
         socket.on("inform_me_about_other_user", function (other_users) {
             var userNumber = other_users.length;
             var userNumb = userNumber + 1;
@@ -600,7 +624,7 @@ var MyApp = (function () {
         formData.append("username", user_id);
         console.log(formData);
         $.ajax({
-            url: base_url + "/attaching",
+            url: base_url + "/attachimg",
             type: "POST",
             data: formData,
             contentType: false,
@@ -611,6 +635,17 @@ var MyApp = (function () {
             error: function () {
                 console.log("error");
             },
+        });
+        var attachFileArea = document.querySelector(".show-attach-file");
+        var attachFileName = $("#customFile").val().split("\\").pop();
+        var attachFilePath = "public/attachment/" + meeting_id + "/" + attachFileName;
+        attachFileArea.innerHTML += "<div class='left-align' style='display:flex; align-items:center;'><img src='public/assets/images/other.jpg' style='height:40px;width:40px;' class='caller-image circle'><div style='font-weight:600;margin:0 5px;'>" + user_id + "</div>:<div><a style='color:#007bff;' href='" + attachFilePath + "' download>" + attachFileName + "</a></div></div><br/>";
+        $("label.custom-file-label").text("");
+        socket.emit("fileTransferToOther", {
+            username: user_id,
+            meetingid: meeting_id,
+            filePath: attachFilePath,
+            fileName: attachFileName
         });
     });
 
