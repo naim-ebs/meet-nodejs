@@ -345,6 +345,8 @@ var MyApp = (function () {
     var socket = null;
     var user_id = "";
     var meeting_id = "";
+    var mediaRecorder = null;
+    var chunks = [];
     function init(uid, mid) {
         user_id = uid;
         meeting_id = mid;
@@ -653,6 +655,57 @@ var MyApp = (function () {
         $(".recording-show").toggle(300);
     });
 
+    $(document).on("click", ".start-record", function () {
+        $(this).removeClass().addClass("stop-record btn-danger text-dark").text("Stop Recording");
+        startRecording();
+    });
+
+    $(document).on("click", ".stop-record", function () {
+        $(this).removeClass().addClass("start-record btn-dark text-danger").text("Start Recording");
+        mediaRecorder.stop();
+    });
+
+    async function captureScreen() {
+        return await navigator.mediaDevices.getDisplayMedia({
+            video: { mediaSource: "screen" },
+        });
+    }
+
+    async function captureAudio() {
+        return await navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: false,
+        });
+    }
+
+    async function startRecording() {
+        const screenStream = await captureScreen();
+        const audioStream = await captureAudio();
+        const stream = new MediaStream([...screenStream.getTracks(), ...audioStream.getTracks()]);
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.start();
+        mediaRecorder.onstop = function (e) {
+            var clipName = prompt("Enter a name for your recording");
+            stream.getTracks().forEach((track) => track.stop());
+            const blob = new Blob(chunks, {
+                type: "video/webm",
+            });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.style.display = "none";
+            a.href = url;
+            a.download = clipName + ".webm";
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 100);
+        };
+        mediaRecorder.ondataavailable = function (e) {
+            chunks.push(e.data);
+        };
+    }
     return {
         _init: function (uid, mid) {
             init(uid, mid);
